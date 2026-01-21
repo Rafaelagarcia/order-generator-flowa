@@ -1,0 +1,33 @@
+Faça duas aplicações em qualquer linguagem de programação: o OrderGenerator (frontend) e o
+OrderAccumulator (backend).
+O OrderGenerator é uma página web com um formulário com os seguintes campos:
+• Ativo: escolhido entre PETR4, VALE3 ou VIIA4;
+• Lado: escolhido entre Compra ou Venda;
+• Quantidade: valor positivo inteiro menor que 100.000;
+• Preço: valor positivo decimal múltiplo de 0.01 e menor que 1.000.
+No resultado do formulário, apresentar a resposta da requisição.
+O OrderAccumulator recebe as ordens via REST/JSON:
+{
+ativo: "PETR4" | "VALE3" | "VIIA4",
+lado: "C" | "V",
+quantidade: 584,
+preco: 54.87
+}
+e calcula a "Exposição Financeira" por ativo, como definido a seguir:
+Exposição financeira = somatório de (preço * quantidade executada) de cada ordem de compra
+- somatório de (preço * quantidade executada) de venda
+Ou seja, as ordens de compra aumentam a exposição e as de venda diminuem a exposição.
+O OrderAccumulator terá um limite interno constante, por ativo, de R$ 1.000.000 (um milhão). Isso
+significa que qualquer ordem que venha a ultrapassar em valor absoluto o limite de exposição deve
+ser rejeitada e respondida com erro.
+Ou seja, caso a ordem seja aceita, o OrderAccumulator deve responder com "Sucesso" e a ordem
+deve ser registrada na "Exposição Financeira" e caso a ordem seja rejeitada, o OrderAccumulator
+deve responder com "Erro" e a ordem não deve ser registrada na "Exposição Financeira". O JSON
+de resposta deve ser o seguinte:
+{
+sucesso: true | false,
+exposicao_atual: 12345.67,
+msg_erro: "Erro aconteceu porque ..."
+}
+
+#testar api via thunder client no vs code

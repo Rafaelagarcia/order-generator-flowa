@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Generator</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; padding: 40px; }
+        .container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 400px; }
+        h2 { color: #333; text-align: center; margin-bottom: 25px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
+        select, input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background-color: #28a745; border: none; color: white; font-weight: bold; border-radius: 4px; cursor: pointer; margin-top: 10px; }
+        button:hover { background-color: #218838; }
+        #resultado { margin-top: 20px; padding: 15px; border-radius: 4px; font-family: monospace; font-size: 13px; display: none; }
+        .sucesso { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .erro { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Order Generator</h2>
+    <form id="orderForm">
+        <div class="form-group">
+            <label>Ativo:</label>
+            <select id="ativo">
+                <option value="PETR4">PETR4</option>
+                <option value="VALE3">VALE3</option>
+                <option value="VIIA4">VIIA4</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Lado:</label>
+            <select id="lado">
+                <option value="C">Compra</option>
+                <option value="V">Venda</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Quantidade:</label>
+            <input type="number" id="quantidade" min="1" max="99999" required placeholder="Ex: 584">
+        </div>
+        <div class="form-group">
+            <label>Preço (R$):</label>
+            <input type="number" id="preco" step="0.01" min="0.01" max="999.99" required placeholder="Ex: 54.87">
+        </div>
+        <button type="submit">Enviar Ordem</button>
+    </form>
+
+    <div id="resultado"></div>
+</div>
+
+<script>
+    const form = document.getElementById('orderForm');
+    const resDiv = document.getElementById('resultado');
+
+    form.onsubmit = async (e) => {
+        e.preventDefault();
+        
+        const payload = {
+            ativo: document.getElementById('ativo').value,
+            lado: document.getElementById('lado').value,
+            quantidade: parseInt(document.getElementById('quantidade').value),
+            preco: parseFloat(document.getElementById('preco').value)
+        };
+//http://127.0.0.1:5000/order caminho local
+        try {
+            const response = await fetch('http://127.0.0.1:5000/order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+            
+            resDiv.style.display = 'block';
+            resDiv.className = data.sucesso ? 'sucesso' : 'erro';
+            resDiv.innerText = JSON.stringify(data, null, 2);
+
+        } catch (error) {
+            resDiv.style.display = 'block';
+            resDiv.className = 'erro';
+            resDiv.innerText = "Erro: Não foi possível conectar ao servidor.";
+        }
+    };
+</script>
+
+</body>
+</html>
